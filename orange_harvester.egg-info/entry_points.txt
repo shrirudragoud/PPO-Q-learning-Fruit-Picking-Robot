@@ -1,0 +1,3 @@
+[console_scripts]
+evaluate-harvester = evaluate_harvester:main
+train-harvester = train_harvester:main

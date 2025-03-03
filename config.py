@@ -62,6 +62,7 @@ class SimConfig:
         STEPS_PER_EPISODE = 1000
         BATCH_SIZE = 64
         EPOCHS = 10
+        CHECKPOINT_INTERVAL = 100  # Save checkpoint every N episodes
         
         # Learning rates
         ACTOR_LR = 0.0003

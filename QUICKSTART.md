@@ -1,144 +1,193 @@
-# Quick Start Guide
+# Orange Harvesting Robot - Training Guide
 
-## Immediate Testing
+## Setup
 
-1. Double click `setup_and_run.bat`
-   - Sets up Python environment
-   - Installs required packages
-   - Launches the simulation
+1. Automated Setup (Recommended):
 
-## Environment Features
+```bash
+# Run the automated setup script
+setup_and_verify.bat
 
-1. Orange Farm Layout:
-
-   - 12 orange trees in grid pattern
-   - Decorative rocks and bushes
-   - Farm boundary with fences
-   - Textured ground with grid
-
-2. Interactive Elements:
-   - Pickable oranges
-   - Distance indicators to fruits
-   - Visual feedback for picking range
-   - Dynamic fruit respawning
-
-## Controls
-
-### Basic Movement
-
-```
-X - Toggle Controls (Must enable first!)
-WASD - Robot Movement
-  W/S - Forward/Backward
-  A/D - Turn Left/Right
+# This will:
+# - Create a Python virtual environment
+# - Install PyTorch with CUDA support
+# - Install all dependencies
+# - Verify the environment
+# - Test dimensions and robot initialization
 ```
 
-### Arm & Gripper
+2. Verify Installation:
 
+After setup completes, check that:
+
+- All dependencies were installed successfully
+- PyTorch can detect your GPU (if available)
+- Environment dimensions are correct
+- Robot initializes without errors
+
+3. Test Environment:
+
+```bash
+# Run the environment test script
+test_environment.bat
+
+# This will:
+# - Test robot movement
+# - Verify reward calculations
+# - Check fruit collection mechanics
 ```
-I/K - Shoulder Up/Down
-O/L - Elbow Up/Down
-Space - Gripper (Hold near fruit to pick!)
+
+4. Troubleshooting:
+
+If you encounter issues:
+
+```bash
+# Run dimension analysis
+python debug_dims.py
+
+# Check PyTorch/CUDA status
+python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
+
+# Reinstall PyTorch with CUDA (if needed)
+python -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
 ```
 
-### System
+## Training
 
+The training process is divided into three phases to gradually build up the robot's capabilities:
+
+### Phase 1: Basic Movement (500 episodes)
+
+- Focuses on navigation and positioning
+- Higher weight on distance-based rewards
+- Simplified arm control
+
+```bash
+python train_harvester.py --phase 1
 ```
-R - Reset Simulation
-Q - Quit
+
+### Phase 2: Precise Control (1000 episodes)
+
+- Introduces arm movement complexity
+- Adds contact rewards
+- Starts efficiency penalties
+
+```bash
+python train_harvester.py --phase 2
 ```
 
-## Fruit Picking Guide
+### Phase 3: Full Task (1500 episodes)
 
-1. Approaching Fruits:
+- Complete task with all reward components
+- Optimizes for speed and efficiency
+- Fine-tunes movement patterns
 
-   - Watch for yellow distance indicator
-   - Line shows path to nearest fruit
-   - Indicator turns green when in range
+```bash
+python train_harvester.py --phase 3
+```
 
-2. Picking Process:
-   - Move close to fruit (green indicator)
-   - Position arm near fruit
-   - Hold Space to grip
-   - Fruit disappears when picked
+## Training Parameters
 
-## Demo Mode
+You can customize training parameters using command line arguments:
 
-1. Automatic Demonstrations:
+```bash
+python train_harvester.py \
+    --phase 1 \
+    --episodes 500 \
+    --learning-rate 3e-4 \
+    --batch-size 64 \
+    --no-gui  # Run without visualization
+```
 
-   - Arm movement patterns
-   - Driving capabilities
-   - Turning demonstrations
-   - Gripper operation
+## Evaluation
 
-2. Switching to Manual:
-   - Press X to disable demo
-   - Status turns green
-   - Controls become active
+To evaluate a trained model:
 
-## Visual Feedback
+```bash
+python evaluate_harvester.py \
+    models/phase_3_final.pt \
+    --episodes 10
+```
 
-1. Status Messages:
+The evaluation will show:
 
-   - Green: Controls enabled
-   - Cyan: Demo mode
-   - Yellow: Fruit distance
-   - White: General info
+- Success rate (fruits collected)
+- Average completion time
+- Movement efficiency
+- Overall performance metrics
 
-2. Environment Markers:
-   - Grid pattern for navigation
-   - Distance lines to fruits
-   - Picking range indicators
-   - Movement feedback
+## Reward Components
 
-## Quick Tests
+The training uses multiple reward components:
 
-1. Movement Check:
+1. Distance Reward
 
-   - Enable controls (X)
-   - Move forward (W)
-   - Turn left/right (A/D)
-   - Check smooth acceleration
+   - Encourages moving closer to fruits
+   - Exponential scaling for precision
 
-2. Fruit Picking:
-   - Approach orange
-   - Watch distance indicator
-   - Wait for green signal
-   - Use gripper (Space)
+2. Progress Reward
 
-## Troubleshooting
+   - Rewards improvement in position
+   - Encourages efficient paths
 
-1. If Controls Don't Work:
+3. Action Efficiency
 
-   - Check status color
-   - Press X to toggle
-   - Ensure window focus
-   - Try resetting (R)
+   - Penalties for unnecessary movements
+   - Promotes smooth trajectories
 
-2. If Fruits Don't Pick:
+4. Contact & Success Rewards
+   - Large rewards for successful grips
+   - Completion bonuses for fruit collection
 
-   - Get closer to fruit
-   - Wait for green indicator
-   - Position arm correctly
-   - Hold Space button
+## Training Tips
 
-3. Performance Issues:
-   - Close other applications
-   - Reduce window size
-   - Update graphics drivers
-   - Check CPU/Memory usage
+1. Monitor Progress
 
-## Getting Help
+   - Watch tensorboard logs for learning curves
+   - Check success rate trends
+   - Monitor average episode length
 
-1. Debug Information:
+2. Common Issues
 
-   - Watch status messages
-   - Check distance indicators
-   - Monitor console output
-   - Verify control state
+   - If the robot moves erratically, lower the learning rate
+   - If progress stalls, try adjusting reward weights
+   - If arm control is imprecise, increase training episodes
 
-2. Common Solutions:
-   - Reset simulation
-   - Restart program
-   - Check error messages
-   - Follow visual guides
+3. Performance Optimization
+   - Use --no-gui for faster training
+   - Adjust batch size based on available memory
+   - Consider lowering action frequency for smoother control
+
+## Visualization
+
+To visualize training progress:
+
+```bash
+tensorboard --logdir logs
+```
+
+Key metrics to watch:
+
+- Average episode reward
+- Success rate
+- Action distributions
+- Value function estimates
+
+## Model Files
+
+Trained models are saved in the `models/` directory:
+
+- `phase_1_final.pt`: Basic movement model
+- `phase_2_final.pt`: Precise control model
+- `phase_3_final.pt`: Complete task model
+
+Checkpoints are saved every 100 episodes during training.
+
+## Next Steps
+
+After successful training, you can:
+
+1. Fine-tune the model for specific scenarios
+2. Experiment with different reward weightings
+3. Test in varied environments
+4. Implement multi-robot coordination

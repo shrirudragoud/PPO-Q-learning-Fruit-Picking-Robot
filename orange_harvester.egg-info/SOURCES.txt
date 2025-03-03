@@ -1,0 +1,8 @@
+README.md
+setup.py
+orange_harvester.egg-info/PKG-INFO
+orange_harvester.egg-info/SOURCES.txt
+orange_harvester.egg-info/dependency_links.txt
+orange_harvester.egg-info/entry_points.txt
+orange_harvester.egg-info/requires.txt
+orange_harvester.egg-info/top_level.txt
