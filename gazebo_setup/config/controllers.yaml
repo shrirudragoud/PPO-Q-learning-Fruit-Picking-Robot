@@ -1,0 +1,51 @@
+# Robot joint controllers
+fruit_harvesting_robot:
+  # Joint state controller
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50
+
+  # Wheel controllers (velocity control)
+  front_left_wheel_controller:
+    type: velocity_controllers/JointVelocityController
+    joint: front_left_wheel_joint
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+
+  front_right_wheel_controller:
+    type: velocity_controllers/JointVelocityController
+    joint: front_right_wheel_joint
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+
+  rear_left_wheel_controller:
+    type: velocity_controllers/JointVelocityController
+    joint: rear_left_wheel_joint
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+
+  rear_right_wheel_controller:
+    type: velocity_controllers/JointVelocityController
+    joint: rear_right_wheel_joint
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+
+  # Arm controllers (position control)
+  shoulder_controller:
+    type: position_controllers/JointPositionController
+    joint: shoulder_joint
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+
+  elbow_controller:
+    type: position_controllers/JointPositionController
+    joint: elbow_joint
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+
+  wrist_controller:
+    type: position_controllers/JointPositionController
+    joint: wrist_pitch_joint
+    pid: {p: 50.0, i: 0.01, d: 5.0}
+
+  # Gripper controller
+  gripper_controller:
+    type: position_controllers/JointGroupPositionController
+    joints:
+      - left_finger_joint
+      - right_finger_joint
+    pid: {p: 50.0, i: 0.01, d: 5.0}

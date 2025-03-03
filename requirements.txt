@@ -1,0 +1,7 @@
+pybullet>=3.2.5
+numpy>=1.21.0
+pytest>=7.0.0  # For testing
+matplotlib>=3.4.0  # For visualization
+pillow>=8.3.0  # For image processing
+scipy>=1.7.0  # For calculations
+tqdm>=4.65.0  # For progress bars

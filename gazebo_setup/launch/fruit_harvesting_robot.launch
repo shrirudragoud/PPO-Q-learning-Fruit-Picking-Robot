@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Launch Gazebo with our world -->
+  <arg name="paused" default="false"/>
+  <arg name="gui" default="true"/>
+  <arg name="headless" default="false"/>
+  <arg name="debug" default="false"/>
+
+  <!-- Set parameters -->
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find fruit_harvesting_robot)/urdf/fruit_harvesting_robot.urdf'"/>
+  <param name="use_sim_time" value="true"/>
+
+  <!-- Launch Gazebo -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" value="$(find fruit_harvesting_robot)/worlds/orange_farm.world"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="gui" value="$(arg gui)"/>
+    <arg name="headless" value="$(arg headless)"/>
+    <arg name="debug" value="$(arg debug)"/>
+  </include>
+
+  <!-- Spawn the robot -->
+  <node name="spawn_robot" pkg="gazebo_ros" type="spawn_model" 
+        args="-urdf -param robot_description -model fruit_harvesting_robot"
+        output="screen"/>
+
+  <!-- Load controllers -->
+  <rosparam command="load" file="$(find fruit_harvesting_robot)/config/controllers.yaml"/>
+  
+  <!-- Start controllers -->
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+        output="screen" ns="/fruit_harvesting_robot" 
+        args="joint_state_controller
+              front_left_wheel_controller
+              front_right_wheel_controller
+              rear_left_wheel_controller
+              rear_right_wheel_controller
+              shoulder_controller
+              elbow_controller
+              wrist_controller
+              gripper_controller"/>
+
+  <!-- Robot state publisher -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+        respawn="false" output="screen">
+    <remap from="/joint_states" to="/fruit_harvesting_robot/joint_states"/>
+  </node>
+
+  <!-- Keyboard teleop -->
+  <node name="keyboard_control" pkg="fruit_harvesting_robot" type="keyboard_control_node" output="screen">
+    <param name="linear_scale" value="0.5"/>
+    <param name="angular_scale" value="1.0"/>
+  </node>
+
+  <!-- RViz for visualization (optional) -->
+  <arg name="rviz" default="false"/>
+  <group if="$(arg rviz)">
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find fruit_harvesting_robot)/rviz/robot.rviz"/>
+  </group>
+
+</launch>
