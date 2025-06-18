@@ -58,62 +58,47 @@ class SimConfig:
     # RL Training parameters (for future use)
     class Training:
         # PPO parameters
-        EPISODES = 1000
-        STEPS_PER_EPISODE = 1000
+        ACTOR_LR = 3e-4
+        CRITIC_LR = 1e-3
+        GAMMA = 0.99
+        GAE_LAMBDA = 0.95
+        CLIP_EPSILON = 0.2
         BATCH_SIZE = 64
         EPOCHS = 10
-        
-        # Learning rates
-        ACTOR_LR = 0.0003
-        CRITIC_LR = 0.001
-        
-        # PPO specific
-        GAMMA = 0.99              # Discount factor
-        GAE_LAMBDA = 0.95         # GAE parameter
-        CLIP_EPSILON = 0.2        # PPO clip parameter
-        VALUE_CLIP = 0.2          # Value function clip parameter
-        ENTROPY_COEF = 0.01       # Entropy coefficient
-        
-        # Observation space
+        EPISODES = 1000
+        STEPS_PER_EPISODE = 200
+        ENTROPY_COEF = 0.01
+
+        # Observation space (updated to match new observation vector)
         class Observation:
             ROBOT_STATE = [
                 'position_x',
                 'position_y',
-                'orientation',
-                'linear_velocity',
-                'angular_velocity',
-                'shoulder_angle',
-                'elbow_angle',
-                'wrist_angle',
-                'gripper_position'
+                'position_z',
             ]
-            
-            ENVIRONMENT_STATE = [
-                'nearest_fruit_distance',
-                'nearest_fruit_direction',
-                'nearest_tree_distance',
-                'nearest_tree_direction',
-                'fruits_remaining'
+            GRIPPER_STATE = [
+                'gripper_x',
+                'gripper_y',
+                'gripper_z',
             ]
-            
-            LIDAR_RAYS = 16       # Number of lidar rays
-            RAY_LENGTH = 5.0      # Maximum ray length
-        
+            FRUIT_STATE = [
+                'fruit_x',
+                'fruit_y',
+                'fruit_z',
+            ]
+            # No LIDAR or extra environment state
+            LIDAR_RAYS = 0
+
         # Action space
         class Action:
             CONTINUOUS = [
                 'forward_velocity',
-                'turning_velocity',
-                'shoulder_position',
-                'elbow_position',
-                'wrist_position',
-                'gripper_position'
+                'turn_velocity',
+                'shoulder',
+                'elbow',
+                'wrist',
+                'gripper',
             ]
-            
-            # Action bounds
-            VELOCITY_RANGE = (-1.0, 1.0)
-            JOINT_RANGE = (-1.0, 1.0)
-            GRIPPER_RANGE = (0.0, 1.0)
     
     # Visualization parameters
     class Visualization:

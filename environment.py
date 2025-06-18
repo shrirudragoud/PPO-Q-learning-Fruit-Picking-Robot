@@ -389,3 +389,21 @@ class FarmEnvironment:
         # Add new fruits to trees
         for position in self.tree_positions:
             self.add_fruits_to_tree(position, 2.0)  # 2.0 is trunk height
+
+    def get_observation(self, robot_position, gripper_position):
+        """Return observation vector including robot state and nearest fruit position"""
+        # Get nearest fruit info
+        fruit_id, fruit_distance, fruit_pos = self.get_closest_fruit(robot_position)
+        if fruit_pos is None:
+            fruit_pos = [0.0, 0.0, 0.0]  # Default if no fruit
+        # Example: observation = [robot_x, robot_y, gripper_x, gripper_y, fruit_x, fruit_y, fruit_z]
+        obs = list(robot_position) + list(gripper_position) + list(fruit_pos)
+        return np.array(obs, dtype=np.float32)
+
+    def compute_reward(self, gripper_position, fruit_position, threshold=0.15):
+        """Reward is 1 if gripper is close to fruit, else negative distance"""
+        dist = np.linalg.norm(np.array(gripper_position) - np.array(fruit_position))
+        if dist < threshold:
+            return 1.0, True  # Reward, done
+        else:
+            return -dist, False
